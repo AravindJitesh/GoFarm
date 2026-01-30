@@ -16,14 +16,49 @@ const iconMap = {
   Headset: <Headset size={28} />,
 };
 
+/* ---------- ANIMATION VARIANTS ---------- */
+const titleVariant = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.7,
+      ease: "easeOut",
+    },
+  },
+};
+
+const containerVariant = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const cardVariant = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.55,
+      ease: "easeOut",
+    },
+  },
+};
+
 export default function Services() {
   const [page, setPage] = useState(0);
   const [cardWidth, setCardWidth] = useState(0);
 
-  const x = useMotionValue(0); // single source of truth
+  const x = useMotionValue(0);
   const trackRef = useRef(null);
 
-  const GAP = 32; // gap-8
+  const GAP = 32;
 
   /* ---------- RESPONSIVE ---------- */
   const CARDS_PER_VIEW =
@@ -70,6 +105,7 @@ export default function Services() {
       className="relative section overflow-hidden
                  bg-gradient-to-b from-slate-900 via-emerald-950 to-slate-950"
     >
+      {/* BACKDROP */}
       <div
         className="absolute inset-0
         bg-[radial-gradient(ellipse_at_top,rgba(16,185,129,0.10),transparent_60%)]"
@@ -78,10 +114,10 @@ export default function Services() {
       <div className="relative container px-4">
         {/* TITLE */}
         <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          variants={titleVariant}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, margin: "-80px" }}
           className="text-center text-3xl font-semibold mb-14 text-slate-100"
         >
           What We Do
@@ -119,6 +155,10 @@ export default function Services() {
               drag="x"
               dragMomentum={false}
               dragElastic={0.02}
+              variants={containerVariant}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
               onDragEnd={(_, info) => {
                 if (!cardWidth) return;
 
@@ -135,16 +175,25 @@ export default function Services() {
               }}
             >
               {services.map((s) => (
-                <div
+                <motion.div
                   key={s.title}
                   data-card
+                  variants={cardVariant}
                   className="
                     min-w-full
                     sm:min-w-[calc(50%-1rem)]
                     lg:min-w-[calc(33.333%-1.33rem)]
                   "
                 >
-                  <div
+                  <motion.div
+                    whileHover={{
+                      y: -6,
+                    }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 25,
+                    }}
                     className="relative h-full rounded-2xl p-7 text-center
                                bg-white/5 backdrop-blur
                                border border-white/10 shadow-lg"
@@ -170,8 +219,8 @@ export default function Services() {
 
                       <p className="text-slate-400">{s.desc}</p>
                     </div>
-                  </div>
-                </div>
+                  </motion.div>
+                </motion.div>
               ))}
             </motion.div>
           </div>
