@@ -3,26 +3,33 @@ import { motion, useScroll, useTransform } from "framer-motion";
 export default function PlantSketch() {
   const { scrollYProgress } = useScroll();
 
+  /* 🌱 Appearance */
+  const appear = useTransform(scrollYProgress, [0.08, 0.14], [0, 1]);
 
+  /* 🌿 Growth stages – slightly tighter for mobile scroll length */
+  const stem = useTransform(scrollYProgress, [0.12, 0.24], [0, 1]);
+  const leaves = useTransform(scrollYProgress, [0.16, 0.28], [0, 1]);
+  const flower = useTransform(scrollYProgress, [0.22, 0.34], [0, 1]);
 
-/* Fade in slightly earlier */
-const appear = useTransform(scrollYProgress, [0.1, 0.14], [0, 1]);
-
-/* Faster, tighter growth windows */
-const stem = useTransform(scrollYProgress, [0.12, 0.22], [0, 1]);
-const leaves = useTransform(scrollYProgress, [0.16, 0.26], [0, 1]);
-const flower = useTransform(scrollYProgress, [0.22, 0.32], [0, 1]);
-
-/* Gentle sway stays the same */
-const sway = useTransform(scrollYProgress, [0, 1], [-1.5, 1.5]);
-
+  /* 🌬 Reduced sway for mobile comfort */
+  const sway = useTransform(scrollYProgress, [0, 1], [-1, 1]);
 
   return (
     <motion.svg
       viewBox="0 0 800 600"
-      className="absolute bottom-0 right-10 w-[520px] h-[520px]
-                 pointer-events-none opacity-30"
-      style={{ rotate: sway, opacity: appear }}
+     className="
+  absolute bottom-[-24px] sm:bottom-0
+  right-4 sm:right-8 md:right-10
+  w-[320px] h-[320px]
+  sm:w-[420px] sm:h-[420px]
+  md:w-[520px] md:h-[520px]
+  pointer-events-none
+"
+
+      style={{
+        rotate: sway,
+        opacity: appear,
+      }}
     >
       {/* === PLANT 1 (CENTER) === */}
 
@@ -70,7 +77,7 @@ const sway = useTransform(scrollYProgress, [0, 1], [-1.5, 1.5]);
         style={{ pathLength: flower }}
       />
 
-      {/* === PLANT 2 (SMALL LEFT) === */}
+      {/* === PLANT 2 (LEFT) === */}
       <motion.path
         d="M260 560 C255 500 260 450 258 400"
         fill="none"
@@ -87,7 +94,7 @@ const sway = useTransform(scrollYProgress, [0, 1], [-1.5, 1.5]);
         style={{ pathLength: leaves }}
       />
 
-      {/* === PLANT 3 (SMALL RIGHT) === */}
+      {/* === PLANT 3 (RIGHT) === */}
       <motion.path
         d="M540 560 C545 500 540 450 542 400"
         fill="none"

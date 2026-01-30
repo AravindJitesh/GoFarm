@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, useMotionValue, animate } from "framer-motion";
 import {
   MapPin,
   Leaf,
@@ -6,7 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useLayoutEffect } from "react";
 import { services } from "../data/siteData";
 
 /* ---------- ICON MAP ---------- */
@@ -16,35 +16,52 @@ const iconMap = {
   Headset: <Headset size={28} />,
 };
 
-/* ---------- CARD ANIMATION ---------- */
-const cardVariants = {
-  hidden: (direction) => ({
-    opacity: 0,
-    x: direction > 0 ? 80 : -80,
-  }),
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: { duration: 0.45, ease: "easeOut" },
-  },
-  exit: (direction) => ({
-    opacity: 0,
-    x: direction > 0 ? -80 : 80,
-    transition: { duration: 0.35 },
-  }),
-};
-
 export default function Services() {
   const [page, setPage] = useState(0);
-  const [direction, setDirection] = useState(0);
+  const [cardWidth, setCardWidth] = useState(0);
 
-  const CARDS_PER_VIEW = 3;
+  const x = useMotionValue(0); // single source of truth
+  const trackRef = useRef(null);
+
+  const GAP = 32; // gap-8
+
+  /* ---------- RESPONSIVE ---------- */
+  const CARDS_PER_VIEW =
+    typeof window !== "undefined" && window.innerWidth < 640
+      ? 1
+      : window.innerWidth < 1024
+      ? 2
+      : 3;
+
   const totalPages = Math.max(services.length - CARDS_PER_VIEW, 0);
-  const visibleServices = services.slice(page, page + CARDS_PER_VIEW);
 
-  const paginate = (dir) => {
-    setDirection(dir);
-    setPage((p) => Math.min(Math.max(p + dir, 0), totalPages));
+  /* ---------- MEASURE CARD WIDTH ---------- */
+  useLayoutEffect(() => {
+    if (!trackRef.current) return;
+
+    const card = trackRef.current.querySelector("[data-card]");
+    if (!card) return;
+
+    const width = card.offsetWidth + GAP;
+    setCardWidth(width);
+
+    animate(x, -page * width, {
+      type: "spring",
+      stiffness: 70,
+      damping: 35,
+      mass: 1.4,
+    });
+  }, [CARDS_PER_VIEW]);
+
+  /* ---------- PAGINATE ---------- */
+  const goToPage = (next) => {
+    setPage(next);
+    animate(x, -next * cardWidth, {
+      type: "spring",
+      stiffness: 70,
+      damping: 35,
+      mass: 1.4,
+    });
   };
 
   return (
@@ -53,146 +70,121 @@ export default function Services() {
       className="relative section overflow-hidden
                  bg-gradient-to-b from-slate-900 via-emerald-950 to-slate-950"
     >
-      {/* BACKGROUND GLOW */}
       <div
         className="absolute inset-0
         bg-[radial-gradient(ellipse_at_top,rgba(16,185,129,0.10),transparent_60%)]"
       />
 
-      <div className="relative container">
+      <div className="relative container px-4">
         {/* TITLE */}
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ amount: 0.6 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center text-3xl font-semibold mb-16
-                     text-slate-100 tracking-tight"
+          className="text-center text-3xl font-semibold mb-14 text-slate-100"
         >
           What We Do
         </motion.h2>
 
-        {/* SLIDER WRAPPER */}
+        {/* SLIDER */}
         <div className="relative">
-          {/* LEFT ARROW */}
+          {/* ARROWS */}
           <button
-            onClick={() => paginate(-1)}
+            onClick={() => goToPage(page - 1)}
             disabled={page === 0}
-            className="absolute -left-14 top-1/2 -translate-y-1/2 z-10
-                       p-3 rounded-full
-                       bg-white/5 backdrop-blur
-                       border border-white/10
-                       text-slate-300
-                       disabled:opacity-30
-                       hover:border-emerald-400/40
-                       transition"
+            className="hidden lg:flex absolute -left-16 top-1/2 -translate-y-1/2
+                       p-3 rounded-full bg-white/5 border border-white/10
+                       text-slate-300 disabled:opacity-30"
           >
             <ChevronLeft size={22} />
           </button>
 
-          {/* RIGHT ARROW */}
           <button
-            onClick={() => paginate(1)}
+            onClick={() => goToPage(page + 1)}
             disabled={page === totalPages}
-            className="absolute -right-14 top-1/2 -translate-y-1/2 z-10
-                       p-3 rounded-full
-                       bg-white/5 backdrop-blur
-                       border border-white/10
-                       text-slate-300
-                       disabled:opacity-30
-                       hover:border-emerald-400/40
-                       transition"
+            className="hidden lg:flex absolute -right-16 top-1/2 -translate-y-1/2
+                       p-3 rounded-full bg-white/5 border border-white/10
+                       text-slate-300 disabled:opacity-30"
           >
             <ChevronRight size={22} />
           </button>
 
-          {/* DRAGGABLE AREA */}
-          <motion.div
-            className="overflow-hidden"
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.15}
-            onDragEnd={(_, info) => {
-              if (info.offset.x < -100) paginate(1);
-              if (info.offset.x > 100) paginate(-1);
-            }}
-          >
-            <motion.div className="grid md:grid-cols-3 gap-10 cursor-grab active:cursor-grabbing">
-              <AnimatePresence
-                initial={false}
-                custom={direction}
-                mode="popLayout"
-              >
-                {visibleServices.map((s) => (
-                  <motion.div
-                    key={s.title}
-                    custom={direction}
-                    variants={cardVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    className="group relative"
+          {/* VIEWPORT */}
+          <div className="overflow-hidden touch-pan-y">
+            <motion.div
+              ref={trackRef}
+              className="flex gap-8"
+              style={{ x }}
+              drag="x"
+              dragMomentum={false}
+              dragElastic={0.02}
+              onDragEnd={(_, info) => {
+                if (!cardWidth) return;
+
+                const swipeThreshold = cardWidth * 0.45;
+                let targetPage = page;
+
+                if (info.offset.x < -swipeThreshold && page < totalPages) {
+                  targetPage = page + 1;
+                } else if (info.offset.x > swipeThreshold && page > 0) {
+                  targetPage = page - 1;
+                }
+
+                goToPage(targetPage);
+              }}
+            >
+              {services.map((s) => (
+                <div
+                  key={s.title}
+                  data-card
+                  className="
+                    min-w-full
+                    sm:min-w-[calc(50%-1rem)]
+                    lg:min-w-[calc(33.333%-1.33rem)]
+                  "
+                >
+                  <div
+                    className="relative h-full rounded-2xl p-7 text-center
+                               bg-white/5 backdrop-blur
+                               border border-white/10 shadow-lg"
                   >
-                    {/* GLOW */}
                     <div
                       className="absolute inset-0 rounded-2xl
-                                 bg-gradient-to-r from-emerald-500/20 to-teal-500/20
-                                 opacity-0 blur-xl transition-opacity duration-300
-                                 group-hover:opacity-100"
+                      bg-gradient-to-r from-emerald-500/20 to-teal-500/20
+                      blur-xl opacity-40"
                     />
 
-                    {/* CARD */}
-                    <div
-                      className="relative rounded-2xl p-8 text-center
-                                 bg-white/5 backdrop-blur
-                                 border border-white/10 shadow-lg
-                                 transition-all duration-300
-                                 group-hover:-translate-y-2
-                                 group-hover:border-emerald-400/30"
-                    >
-                      {/* ICON */}
+                    <div className="relative">
                       <div
-                        className="w-14 h-14 mx-auto mb-4
-                                   rounded-full
-                                   bg-gradient-to-br from-emerald-500 to-green-500
-                                   text-white
-                                   flex items-center justify-center
-                                   opacity-90
-                                   group-hover:scale-110 transition-transform duration-300"
+                        className="w-14 h-14 mx-auto mb-4 rounded-full
+                        bg-gradient-to-br from-emerald-500 to-green-500
+                        text-white flex items-center justify-center"
                       >
                         {iconMap[s.iconName]}
                       </div>
 
-                      <h3 className="text-xl font-semibold mb-2 text-slate-100">
+                      <h3 className="text-xl font-semibold text-slate-100 mb-2">
                         {s.title}
                       </h3>
 
-                      <p className="text-slate-400 leading-relaxed">
-                        {s.desc}
-                      </p>
+                      <p className="text-slate-400">{s.desc}</p>
                     </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+                  </div>
+                </div>
+              ))}
             </motion.div>
-          </motion.div>
+          </div>
         </div>
 
-        {/* DOT INDICATORS */}
+        {/* DOTS */}
         <div className="flex justify-center gap-2 mt-10">
           {Array.from({ length: totalPages + 1 }).map((_, i) => (
             <button
               key={i}
-              onClick={() => {
-                setDirection(i > page ? 1 : -1);
-                setPage(i);
-              }}
-              className={`h-2.5 rounded-full transition-all duration-300
-                ${
-                  page === i
-                    ? "w-8 bg-emerald-400"
-                    : "w-2.5 bg-white/20 hover:bg-white/40"
-                }`}
+              onClick={() => goToPage(i)}
+              className={`h-2.5 rounded-full transition-all
+                ${page === i ? "w-7 bg-emerald-400" : "w-2.5 bg-white/30"}`}
             />
           ))}
         </div>

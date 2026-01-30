@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 
-/* ---------- COPY ICON (DOTTED SQUARE ANIMATED) ---------- */
+/* ---------- COPY ICON ---------- */
 function CopyIcon() {
   return (
     <motion.svg
@@ -54,14 +54,13 @@ export default function Contact() {
         bg-[radial-gradient(circle_at_bottom,rgba(16,185,129,0.15),transparent_60%)]"
       />
 
-      <div className="relative container max-w-4xl">
+      <div className="relative container max-w-4xl px-4">
         {/* HEADER */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-          className="text-center mb-20"
+          className="text-center mb-14 md:mb-20"
         >
           <h2 className="text-3xl font-semibold text-slate-100 mb-4">
             Let’s Talk
@@ -71,15 +70,16 @@ export default function Contact() {
           </p>
         </motion.div>
 
-        <div className="space-y-10">
+        <div className="space-y-6 md:space-y-10">
           {/* PHONE */}
           <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: false }}
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="group flex items-center justify-between
-                       rounded-2xl px-8 py-6
+            className="group flex flex-col sm:flex-row
+                       sm:items-center sm:justify-between
+                       gap-4
+                       rounded-2xl px-6 sm:px-8 py-6
                        bg-white/5 backdrop-blur
                        border border-white/10
                        hover:border-emerald-400/40"
@@ -87,7 +87,7 @@ export default function Contact() {
             {/* CLICKABLE PHONE */}
             <a
               href="tel:+918157909781"
-              className="flex items-center gap-5 cursor-pointer"
+              className="flex items-center gap-4 flex-1"
             >
               <div
                 className="h-14 w-14 flex items-center justify-center
@@ -104,11 +104,11 @@ export default function Contact() {
               </div>
             </a>
 
-            {/* COPY BUTTON */}
+            {/* COPY */}
             <button
               onClick={() => copy("+918157909781", "phone")}
-              aria-label="Copy phone number"
-              className="relative p-2 rounded-lg
+              className="self-end sm:self-auto
+                         relative p-2 rounded-lg
                          text-slate-400 hover:text-emerald-400
                          hover:bg-white/5 transition"
             >
@@ -116,11 +116,11 @@ export default function Contact() {
               <AnimatePresence>
                 {copied === "phone" && (
                   <motion.span
-                    initial={{ opacity: 0, y: 6 }}
+                    initial={{ opacity: 0, y: 4 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 6 }}
-                    className="absolute -top-8 right-0
-                               text-xs text-emerald-400 whitespace-nowrap"
+                    exit={{ opacity: 0, y: 4 }}
+                    className="absolute -top-6 right-0
+                               text-xs text-emerald-400"
                   >
                     Copied ✓
                   </motion.span>
@@ -131,12 +131,13 @@ export default function Contact() {
 
           {/* EMAIL */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: false }}
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="group flex items-center justify-between
-                       rounded-2xl px-8 py-6
+            className="group flex flex-col sm:flex-row
+                       sm:items-center sm:justify-between
+                       gap-4
+                       rounded-2xl px-6 sm:px-8 py-6
                        bg-white/5 backdrop-blur
                        border border-white/10
                        hover:border-emerald-400/40"
@@ -144,28 +145,28 @@ export default function Contact() {
             {/* CLICKABLE EMAIL */}
             <a
               href="mailto:contact@gofarm.com?subject=Inquiry&body=Hello%20GoFarm%20Team,"
-              className="flex items-center gap-5 cursor-pointer"
+              className="flex items-center gap-4 flex-1"
             >
               <div
                 className="h-14 w-14 flex items-center justify-center
-                           rounded-full bg-emerald-500 text-white text-2xl"
+                           rounded-full bg-emerald-500 text-white text-xl"
               >
                 ✉
               </div>
 
               <div>
                 <p className="text-sm text-slate-400">Email</p>
-                <p className="text-lg font-semibold text-slate-100">
+                <p className="text-lg font-semibold text-slate-100 break-all">
                   contact@gofarm.com
                 </p>
               </div>
             </a>
 
-            {/* COPY BUTTON */}
+            {/* COPY */}
             <button
               onClick={() => copy("contact@gofarm.com", "email")}
-              aria-label="Copy email address"
-              className="relative p-2 rounded-lg
+              className="self-end sm:self-auto
+                         relative p-2 rounded-lg
                          text-slate-400 hover:text-emerald-400
                          hover:bg-white/5 transition"
             >
@@ -173,11 +174,11 @@ export default function Contact() {
               <AnimatePresence>
                 {copied === "email" && (
                   <motion.span
-                    initial={{ opacity: 0, y: 6 }}
+                    initial={{ opacity: 0, y: 4 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 6 }}
-                    className="absolute -top-8 right-0
-                               text-xs text-emerald-400 whitespace-nowrap"
+                    exit={{ opacity: 0, y: 4 }}
+                    className="absolute -top-6 right-0
+                               text-xs text-emerald-400"
                   >
                     Copied ✓
                   </motion.span>
@@ -191,12 +192,11 @@ export default function Contact() {
             href="https://wa.me/918157909781?text=Hello%20GoFarm%20Team,"
             target="_blank"
             rel="noopener noreferrer"
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
-            whileHover={{ scale: 1.02 }}
-            viewport={{ once: false }}
+            whileTap={{ scale: 0.98 }}
             transition={{ duration: 0.6 }}
-            className="block text-center rounded-2xl px-8 py-8
+            className="block text-center rounded-2xl px-6 py-7
                        bg-gradient-to-r from-emerald-500 to-green-500
                        text-white font-semibold text-lg
                        shadow-xl shadow-emerald-500/30"

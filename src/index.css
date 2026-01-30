@@ -5,7 +5,7 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Base styles */
+/* ---------------- BASE STYLES ---------------- */
 @layer base {
   html,
   body {
@@ -18,26 +18,57 @@ html {
     @apply bg-emerald-950 text-gray-100;
   }
 
+  /* 
+    Scroll offset for anchored sections
+    - Mobile navbar is shorter
+    - Desktop navbar is taller
+  */
   section {
-    scroll-margin-top: 96px; /* match navbar height */
+    scroll-margin-top: 72px;
+  }
+
+  @media (min-width: 768px) {
+    section {
+      scroll-margin-top: 96px;
+    }
   }
 }
 
-/* Reusable layout helpers */
+/* ---------------- LAYOUT HELPERS ---------------- */
 @layer components {
+  /* SECTION SPACING */
   .section {
-    @apply py-24 px-6;
+    @apply px-5 py-16;
   }
 
+  @media (min-width: 640px) {
+    .section {
+      @apply px-6 py-20;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .section {
+      @apply px-6 py-24;
+    }
+  }
+
+  /* CONTAINER */
   .container {
     @apply max-w-6xl mx-auto;
   }
 
+  /* BUTTONS */
   .btn-primary {
-    @apply bg-red-700 text-white px-6 py-3 transition hover:bg-red-800;
+    @apply bg-red-700 text-white px-5 py-3 rounded-lg
+           transition hover:bg-red-800
+           text-sm sm:text-base;
   }
 
   .btn-outline {
-    @apply border border-white px-6 py-3 text-white transition hover:bg-white hover:text-red-900;
+    @apply border border-white px-5 py-3 rounded-lg
+           text-white transition
+           hover:bg-white hover:text-red-900
+           text-sm sm:text-base;
   }
 }
