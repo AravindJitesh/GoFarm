@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Base styles */
+@layer base {
+  html,
+  body {
+    @apply bg-slate-950 text-gray-800 antialiased;
+    font-family: Inter, system-ui, sans-serif;
+  }
+
+  .dark html,
+  .dark body {
+    @apply bg-emerald-950 text-gray-100;
+  }
+
+  section {
+    scroll-margin-top: 96px; /* match navbar height */
+  }
+}
+
+/* Reusable layout helpers */
+@layer components {
+  .section {
+    @apply py-24 px-6;
+  }
+
+  .container {
+    @apply max-w-6xl mx-auto;
+  }
+
+  .btn-primary {
+    @apply bg-red-700 text-white px-6 py-3 transition hover:bg-red-800;
+  }
+
+  .btn-outline {
+    @apply border border-white px-6 py-3 text-white transition hover:bg-white hover:text-red-900;
+  }
+}
